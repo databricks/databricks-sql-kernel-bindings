@@ -1,0 +1,15 @@
+Copyright (2026) Databricks, Inc.
+
+This Software includes software developed at Databricks (https://www.databricks.com/) and its use is subject to the included LICENSE file.
+
+________________
+This repository distributes prebuilt static libraries of the Databricks SQL
+kernel (libdatabricks_sql_kernel). Those compiled artifacts statically include
+third-party open source components. The complete third-party attribution list
+for the bundled kernel build is pending Legal/OSPO review and will be enumerated
+here before this repository is made public.
+
+<!-- TODO(legal/OSPO): populate the full third-party notice list for the kernel
+     static build (e.g. BoringSSL/ring, tokio, hyper, arrow, and their transitive
+     dependencies) prior to public release. Generate from the kernel's Cargo
+     dependency tree + license scan. -->

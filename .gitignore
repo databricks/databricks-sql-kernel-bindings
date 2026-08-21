@@ -1,0 +1,12 @@
+.vscode
+.idea
+.DS_Store
+
+# Test binaries
+*.test
+test-results/
+
+# NOTE: this repo intentionally COMMITS prebuilt kernel static archives
+# (lib/<platform>/libdatabricks_sql_kernel.a). Do NOT add a blanket *.a / *.so /
+# *.dylib ignore here — that would exclude the very artifacts this repo exists to
+# distribute. Committed archives are added explicitly per platform.

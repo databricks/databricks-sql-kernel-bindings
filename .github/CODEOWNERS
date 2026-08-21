@@ -1,0 +1,5 @@
+# Mirrors databricks-sql-go: OSS SQL driver team owns CI/CD workflow changes.
+.github/ @databricks/eng-oss-sql-driver
+
+# The committed kernel archives and binding modules.
+/lib/ @databricks/eng-oss-sql-driver
