@@ -238,16 +238,83 @@ KernelStatusCode kernel_session_config_set_auth_pat(KernelSessionConfig* config,
 KernelStatusCode kernel_session_config_set_auth_m2m(KernelSessionConfig* config,
                                                     const char* client_id,
                                                     const char* client_secret);
+/* OAuth M2M via a JWT private-key client assertion (RFC 7523): the kernel signs
+ * a short-lived JWT with the private key and sends it as the client_assertion
+ * instead of a client secret. `client_id`, `jwt_key_file` (PEM/PKCS#8 private
+ * key path), and `jwt_kid` (key id in the JWT header) are required. Optional
+ * (pass NULL to omit): `jwt_passphrase` (encrypted PKCS#8 key), `jwt_algorithm`
+ * (RS256/384/512, PS256/384/512, ES256, ES384; NULL → RS256), `scopes`
+ * (comma-separated; NULL → kernel default `all-apis`), and `token_url` (explicit
+ * token endpoint; NULL → discover via OIDC). */
+KernelStatusCode kernel_session_config_set_auth_m2m_jwt(KernelSessionConfig* config,
+                                                        const char* client_id,
+                                                        const char* jwt_key_file,
+                                                        const char* jwt_kid,
+                                                        const char* jwt_passphrase,
+                                                        const char* jwt_algorithm,
+                                                        const char* scopes,
+                                                        const char* token_url);
 /* OAuth U2M (user-to-machine: authorization code + PKCE, browser flow).
- * All args optional: `client_id` NULL → public `databricks-cli` client;
- * `redirect_port` 0 → kernel default (8020); `scopes` (comma-separated)
- * NULL → kernel default (`all-apis`,`offline_access`; `offline_access`
+ * All args optional: `client_id` NULL → `databricks-sql-connector` client;
+ * `redirect_port` 0 → kernel default (8030); `scopes` (comma-separated)
+ * NULL → kernel default (`sql`,`offline_access`; `offline_access`
  * yields a cached, auto-refreshed refresh token). INTERACTIVE: opening the
  * session starts a localhost listener and opens the user's browser. */
 KernelStatusCode kernel_session_config_set_auth_u2m(KernelSessionConfig* config,
                                                     const char* client_id,
                                                     uint16_t redirect_port,
                                                     const char* scopes);
+/* Azure Entra service-principal M2M. The kernel owns Azure resolution: it
+ * builds the Entra token endpoint + `{app}/.default` scope and auto-discovers
+ * the tenant from the workspace `/aad/auth` redirect when `azure_tenant_id` is
+ * NULL. `azure_client_id` and `azure_client_secret` (Entra app-registration
+ * credentials) are required. Optional (pass NULL to omit): `azure_tenant_id`,
+ * and `azure_workspace_resource_id` (workspace ARM resource id; when set, the
+ * kernel also sends the Azure SP management token +
+ * `X-Databricks-Azure-Workspace-Resource-Id` header, so a service principal
+ * with an Azure RBAC role but no workspace membership can authenticate; NULL →
+ * the data token authenticates alone). Azure AD U2M has no separate setter —
+ * use kernel_session_config_set_auth_u2m (the kernel's workspace-federated
+ * browser flow works against Azure Databricks workspaces). */
+KernelStatusCode kernel_session_config_set_auth_azure_sp(KernelSessionConfig* config,
+                                                         const char* azure_client_id,
+                                                         const char* azure_client_secret,
+                                                         const char* azure_tenant_id,
+                                                         const char* azure_workspace_resource_id);
+
+/* Optional SP-wide Workload Identity Federation client id used by mandatory
+ * token exchange. Unset selects BYOT / account-wide WIF. */
+KernelStatusCode
+kernel_session_config_set_identity_federation_client_id(KernelSessionConfig* config,
+                                                        const char* client_id);
+
+/* Optional OAuth token-endpoint override, applied to whichever OAuth mode
+ * (M2M, M2M-JWT, or U2M) is selected. Points the token exchange at a non-workspace
+ * endpoint — e.g. the Azure/Entra token endpoint
+ * `https://login.microsoftonline.com/<tenant>/oauth2/v2.0/token` for an Azure
+ * service principal. Unset → OIDC discovery against the workspace host.
+ * No effect on PAT auth.
+ *
+ * The override replaces the token endpoint ONLY. For U2M the authorization
+ * endpoint always comes from OIDC discovery against the workspace host — it is
+ * never derived from this override — so no particular suffix is required and no
+ * value is rejected at session open. M2M / M2M-JWT likewise only have their
+ * token endpoint replaced. */
+KernelStatusCode
+kernel_session_config_set_oauth_token_endpoint(KernelSessionConfig* config,
+                                               const char* token_endpoint);
+
+/* Optional OAuth scopes (comma-separated), applied to whichever OAuth mode
+ * (M2M, M2M-JWT, or U2M) is selected — e.g.
+ * `2ff814a6-3304-4ab8-85cb-cd0e6f879c1d/.default` for an Azure service
+ * principal (M2M), or `sql,offline_access` (U2M). Mirrors the single
+ * `oauth_scopes` the pyo3 / napi bindings expose across both flows. Unset →
+ * kernel per-mode default (`all-apis` for M2M; `sql offline_access` for U2M).
+ * For U2M and M2M-JWT it takes precedence over any scopes passed positionally
+ * to kernel_session_config_set_auth_u2m / kernel_session_config_set_auth_m2m_jwt. */
+KernelStatusCode
+kernel_session_config_set_oauth_scopes(KernelSessionConfig* config,
+                                       const char* scopes);
 
 /* Add (or overwrite) one session-conf entry. Keys are normally server SET
  * parameters forwarded on the SEA wire (allowlist-filtered). A small set of
@@ -282,16 +349,6 @@ KernelStatusCode kernel_session_config_set_custom_header(KernelSessionConfig* co
  * — the file could not be opened (falls back to stderr) or a global
  * subscriber was already installed (no kernel subscriber installed). */
 KernelStatusCode kernel_init_logging(const char* level, const char* file_path);
-
-/* The C ABI version this library implements. A consumer that loads the
- * kernel as a shared library (.so/.dylib/.dll) at run time should call this
- * right after loading and refuse to proceed if the value differs from the
- * version it was built against — turning an ABI mismatch (a wrong or stale
- * shared library) into a clear error instead of silent memory corruption.
- * Bumped on every breaking C ABI change (added/removed/renumbered function,
- * changed struct layout or signature). Not the crate semver — tracks only
- * the C ABI shape. Starts at 1. Takes no pointers; always safe to call. */
-uint32_t kernel_abi_version(void);
 
 /* ─── Proxy / TLS (optional) ──────────────────────────────────────────
  *
@@ -347,6 +404,29 @@ KernelStatusCode kernel_session_config_set_retry_config(KernelSessionConfig* con
                                                         uint64_t min_wait_ms, uint64_t max_wait_ms,
                                                         uint32_t max_retries,
                                                         uint64_t overall_timeout_ms);
+
+/* Configure telemetry collection/export. Telemetry is disabled by default.
+ * `batch_size`, `flush_interval_ms`, and `close_flush_timeout_ms` must be > 0.
+ * `max_retries == 0` disables telemetry export retries; `retry_delay_ms == 0`
+ * means immediate retry. Telemetry failures are fail-open and never change user
+ * operation results. */
+KernelStatusCode kernel_session_config_set_telemetry_config(KernelSessionConfig* config,
+                                                            bool enabled, size_t batch_size,
+                                                            uint64_t flush_interval_ms,
+                                                            uint32_t max_retries,
+                                                            uint64_t retry_delay_ms,
+                                                            uint64_t close_flush_timeout_ms);
+
+/* Configure driver/runtime/system identity supplied by the binding layer.
+ * Every string argument is optional: pass NULL for values the binding does not
+ * know. The kernel fills any missing fields it can derive before emitting
+ * telemetry. Non-NULL strings must be UTF-8. */
+KernelStatusCode kernel_session_config_set_driver_system_configuration(
+    KernelSessionConfig* config, const char* driver_name, const char* driver_version,
+    const char* runtime_name, const char* runtime_version, const char* runtime_vendor,
+    const char* os_name, const char* os_version, const char* os_arch,
+    const char* client_app_name, const char* locale_name, const char* char_set_encoding,
+    const char* process_name);
 
 /* Whether transaction control is ignored (no-oped). `ignore = true` (the
  * default) gives IgnoreTransactions=1 semantics: commit / rollback /
@@ -436,6 +516,18 @@ KernelStatusCode kernel_session_close(kernel_session_t* session);
  * A host backing SQL_ATTR_CONNECTION_DEAD should read `true` as
  * "not known-dead", not a positive liveness guarantee. No ownership. */
 KernelStatusCode kernel_session_is_open(const kernel_session_t* session, bool* out);
+
+/* Actively validate the session against the server by round-tripping a
+ * lightweight `SELECT 1` test query (result discarded). This is the
+ * I/O-performing complement of kernel_session_is_open: it reaches the
+ * server, so it DOES detect a server idle-timeout, a killed warehouse, or
+ * a dropped link. Returns Success when the round-trip completes (session
+ * alive); on failure returns the mapped status (a transport/availability
+ * failure surfaces as Unavailable / NetworkError / Timeout — treat as
+ * "connection dead" when backing SQL_ATTR_CONNECTION_DEAD; the full error
+ * is in kernel_get_last_error). Runs SQL, so it MUST be called from a
+ * native (non-async-runtime) thread. No ownership. */
+KernelStatusCode kernel_session_test(const kernel_session_t* session);
 
 /* Construct a new mutable statement bound to this session. */
 KernelStatusCode kernel_session_new_statement(kernel_session_t* session,

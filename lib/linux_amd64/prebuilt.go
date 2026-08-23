@@ -4,12 +4,11 @@
 // and the cgo directive that links it. Imported for its link side-effect by the
 // root module's prebuilt_linux_amd64.go under a matching build constraint.
 //
-// NOTE: libdatabricks_sql_kernel.a for this platform is NOT yet committed — it
-// must be produced by the kernel repo's build-c-abi-libs workflow on a native
-// linux/amd64 runner. Until the real archive is dropped in beside this file, a
-// `-tags databricks_kernel` build for linux/amd64 fails at link with a
-// missing-library error (by design — better than shipping a placeholder). See
-// the repo README and databricks-sql-kernel#244.
+// The committed libdatabricks_sql_kernel.a is a linux/amd64 (x86_64-unknown-linux-gnu)
+// build of the kernel at the revision recorded in the driver's KERNEL_REV; it is
+// produced by the kernel repo's build-c-abi-libs workflow (or an equivalent
+// cross-build) and committed beside this file. See the repo README and
+// databricks-sql-kernel#244.
 //
 // The -l:libdatabricks_sql_kernel.a form (GNU-ld extension) forces the static
 // archive so the linker never prefers a same-named .so.
