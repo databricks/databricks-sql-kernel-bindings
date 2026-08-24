@@ -20,7 +20,7 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
 
 ## [Unreleased]
 
-## [v0.2.1] — unreleased
+## [v0.2.1] - 2026-08-24
 
 - Built from **`databricks-sql-kernel` v0.2.1**; `KERNEL_REV` in the driver
   points at the same commit and the committed `include/databricks_kernel.h`
@@ -34,13 +34,5 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
   OAuth token-endpoint / scopes overrides, `kernel_session_test()`, retry-config
   and CloudFetch-chunk-cap setters, the callback logging bridge, and `Session`
   transaction control — are documented in the kernel v0.2.1 changelog.
-
-## [v0.1.0] — 2026-08-23
-
-- Initial internal cut for driver bring-up. **Not aligned to a kernel release
-  tag** (built from an untagged `databricks-sql-kernel` main commit) and
-  superseded by v0.2.1; not intended for external consumption.
-- darwin (`darwin_amd64` / `darwin_arm64`) modules drop an invalid
-  `-Wl,-rpath,@loader_path` from the cgo `LDFLAGS` — it is rejected by cgo's
-  default LDFLAGS allowlist (so it broke a plain `go build -tags databricks_kernel`
-  on macOS) and is meaningless for a statically linked archive.
+- darwin modules link the archive without `-Wl,-rpath` (rejected by cgo's default
+  LDFLAGS allowlist, and meaningless for a static archive).
