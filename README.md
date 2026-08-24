@@ -53,7 +53,11 @@ v1.2.3                     # the root module
 ```
 
 The driver's `go.mod` pins the versions it needs; upgrading the driver is what
-moves the kernel version. See the driver repo's `docs/RELEASING.md`.
+moves the kernel version. Each bindings version matches the
+`databricks-sql-kernel` release it is built from. See [`RELEASING.md`](./RELEASING.md)
+for the release process and the full pin chain, [`CHANGELOG.md`](./CHANGELOG.md)
+for per-version release notes, and the driver repo's `docs/RELEASING.md` for the
+consumer side.
 
 ## Cloning (contributors)
 
