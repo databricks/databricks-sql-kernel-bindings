@@ -19,9 +19,6 @@ module proxy). To keep the driver repo free of large committed binaries, those
 archives live here instead — one nested Go module per platform, so a build
 downloads **only** the archive for the platform it targets.
 
-This mirrors the model used by
-[`duckdb/duckdb-go-bindings`](https://github.com/duckdb/duckdb-go-bindings).
-
 ## Layout
 
 ```
