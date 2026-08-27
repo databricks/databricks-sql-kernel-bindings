@@ -7,7 +7,7 @@
 // The committed libdatabricks_sql_kernel.a is a windows/arm64 GNU archive built
 // for the aarch64-pc-windows-GNULLVM (llvm-mingw) target — NOT MSVC. Go cgo on
 // Windows links through a GNU toolchain and consumes a GNU `.a`, never an MSVC
-// `.lib`. It is produced by the peco-databricks-sql-kernel-go release workflow
+// `.lib`. It is produced by Databricks' internal CI release pipeline
 // (cross-built on a Linux runner via llvm-mingw) and committed beside this file.
 // See the repo README and RELEASING.md.
 //
