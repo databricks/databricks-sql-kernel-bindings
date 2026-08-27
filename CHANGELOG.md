@@ -20,6 +20,22 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
 
 ## [Unreleased]
 
+## [v0.2.3] - 2026-08-27
+
+- **CI-built (scanned) rebuild of v0.2.2** — identical kernel source
+  (`databricks-sql-kernel` commit `dd810d6d`, tagged `v0.2.2`), rebuilt through
+  the `peco-databricks-sql-kernel-go` release workflow
+  ([run 33056747910](https://github.com/databricks/secure-public-registry-releases-eng/actions/runs/33056747910))
+  so the archives are CI-built and trivy-scanned rather than cross-built on a
+  laptop. **Supersedes v0.2.2**, which was a local dev build of the same source.
+- No API/behaviour change vs v0.2.2 — same C ABI, same `dd810d6d` header. The
+  binaries differ only in build provenance (Rust builds are not bit-reproducible).
+- v0.2.2 remains published but is immutable and superseded; new consumers should
+  pin **v0.2.3**. (v0.2.1/v0.2.2 cannot be re-pointed — Go module versions are
+  immutable once in the checksum DB.)
+- Platforms: `darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm64`,
+  `windows_amd64`.
+
 ## [v0.2.2] - 2026-08-27
 
 - Built from **`databricks-sql-kernel` commit `dd810d6d`** — the post-`v0.2.1`
