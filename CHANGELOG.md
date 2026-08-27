@@ -20,6 +20,28 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
 
 ## [Unreleased]
 
+## [v0.2.2] - 2026-08-27
+
+- Built from **`databricks-sql-kernel` commit `dd810d6d`** — the post-`v0.2.1`
+  revision the driver's `KERNEL_REV` points at. This is **not yet a tagged
+  kernel release**; it carries three **additive** (backward-compatible) C-ABI
+  commits on top of `v0.2.1`:
+  - `feat(c-abi): expose mTLS client identity` — new
+    `kernel_session_config_set_tls_client_certificate`.
+  - `feat(bindings): expose request timeout to Python and C` — new
+    `kernel_session_config_set_request_timeout`.
+  - `fix(metadata): align getTypeInfo with Thrift`.
+- The bump was required because `databricks-sql-go` `main` calls the two new
+  symbols above, which are absent from the `v0.2.1` archives — so `v0.2.1`
+  would fail to link. The C-ABI header is `dd810d6d`'s (a strict superset of
+  `v0.2.1`'s: 19 lines added, none removed/changed).
+- Platforms: `darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm64`,
+  `windows_amd64` (Windows is the **`-gnu`** / MinGW archive, for Go cgo).
+- Provenance note: these archives were **cross-built locally** (not via the
+  `peco-databricks-sql-kernel-go` CI release workflow, whose `peco-release`
+  reviewer gate requires a human). Re-cutting via CI for scanned provenance is
+  a recommended follow-up.
+
 ## [v0.2.1] - 2026-08-24
 
 - Built from **`databricks-sql-kernel` v0.2.1**; `KERNEL_REV` in the driver

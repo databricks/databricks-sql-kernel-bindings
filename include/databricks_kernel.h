@@ -336,6 +336,13 @@ KernelStatusCode kernel_session_config_set_session_conf(KernelSessionConfig* con
 KernelStatusCode kernel_session_config_set_custom_header(KernelSessionConfig* config,
                                                          const char* name, const char* value);
 
+/* Configure the total timeout for one HTTP request, from connection start
+ * through response-body completion. A separate 30s connection timeout also
+ * applies, so connection establishment is bounded by the shorter limit.
+ * `request_timeout_ms == 0` keeps the kernel default (120s). */
+KernelStatusCode kernel_session_config_set_request_timeout(KernelSessionConfig* config,
+                                                           uint64_t request_timeout_ms);
+
 /* Initialize kernel logging, process-wide and ONCE (first non-OFF call wins;
  * later calls are no-ops). `level` is OFF/ERROR/WARN/INFO/DEBUG/TRACE
  * (NULL → RUST_LOG, default warn); `file_path` NULL → stderr. Not tied to
@@ -412,6 +419,18 @@ KernelStatusCode kernel_session_config_set_tls_allow_self_signed(KernelSessionCo
 /* Skip the certificate hostname-vs-SNI check. Development / lab only. */
 KernelStatusCode kernel_session_config_set_tls_skip_hostname_verification(KernelSessionConfig* config,
                                                                          bool skip);
+
+/* Configure a client certificate and private key for mutual TLS (mTLS).
+ * Both values are required and configured atomically. `cert_pem` contains
+ * the PEM leaf certificate followed by any intermediate certificates;
+ * `key_pem` contains the matching unencrypted PEM private key. PKCS#8 is
+ * recommended for portability across the kernel's TLS backends.
+ *
+ * A null pointer or zero length for either value returns InvalidArgument.
+ * The input buffers are copied before this function returns. */
+KernelStatusCode kernel_session_config_set_tls_client_certificate(
+    KernelSessionConfig* config, const uint8_t* cert_pem, size_t cert_len,
+    const uint8_t* key_pem, size_t key_len);
 
 /* Configure the HTTP retry / backoff policy. `min_wait_ms` / `max_wait_ms`
  * are the backoff-wait bounds between attempts (the wait is exponential
