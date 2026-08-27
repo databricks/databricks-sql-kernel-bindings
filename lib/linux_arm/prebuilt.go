@@ -6,9 +6,9 @@
 //
 // The committed libdatabricks_sql_kernel.a is a linux/arm (armv7-unknown-linux-gnueabihf)
 // build of the kernel at the revision recorded in the driver's KERNEL_REV; it is
-// produced by the peco-databricks-sql-kernel-go release workflow (cross-built on a
-// Linux runner via gcc-arm-linux-gnueabihf) and committed beside this file. See
-// the repo README and RELEASING.md.
+// produced by Databricks' internal CI release pipeline (cross-built on a Linux
+// runner via gcc-arm-linux-gnueabihf) and committed beside this file. See the
+// repo README and RELEASING.md.
 //
 // The -l:libdatabricks_sql_kernel.a form (GNU-ld extension) forces the static
 // archive so the linker never prefers a same-named .so. The archive has no C++

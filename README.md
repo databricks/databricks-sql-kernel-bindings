@@ -27,8 +27,7 @@ downloads **only** the archive for the platform it targets.
 
 ```
 databricks-sql-kernel-bindings/
-├── go.mod                         # root module: cgo binding layer + per-platform import shims
-├── include/databricks_kernel.h    # committed C ABI header (platform-independent)
+├── go.mod                         # root module: per-platform import shims
 ├── prebuilt_<os>_<arch>.go         # build-tag-gated: imports the matching lib/<platform> module
 └── lib/
     └── <os>_<arch>/

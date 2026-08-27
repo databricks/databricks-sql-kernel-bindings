@@ -20,14 +20,21 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
 
 ## [Unreleased]
 
+- Remove the committed `include/databricks_kernel.h`. Nothing in this repo
+  compiles against it — the `lib/<platform>` modules carry only the archive +
+  `#cgo LDFLAGS`. The C-ABI header is owned by the driver's cgo layer
+  (`databricks-sql-go`'s `internal/backend/kernel/include/`), which is the only
+  place that `#include`s it. Drops a redundant copy; the header still ships in the
+  release artifact for the driver to sync from. (Root-module-only change; the
+  `lib/<platform>` modules and their tags are unaffected.)
+
 ## [v0.2.3] - 2026-08-27
 
 - **CI-built (scanned) rebuild of v0.2.2** — identical kernel source
   (`databricks-sql-kernel` commit `dd810d6d`, tagged `v0.2.2`), rebuilt through
-  the `peco-databricks-sql-kernel-go` release workflow
-  ([run 33056747910](https://github.com/databricks/secure-public-registry-releases-eng/actions/runs/33056747910))
-  so the archives are CI-built and trivy-scanned rather than cross-built on a
-  laptop. **Supersedes v0.2.2**, which was a local dev build of the same source.
+  Databricks' internal CI release pipeline so the archives are CI-built and
+  trivy-scanned rather than cross-built on a laptop. **Supersedes v0.2.2**, which
+  was a local dev build of the same source.
 - No API/behaviour change vs v0.2.2 — same C ABI, same `dd810d6d` header. The
   binaries differ only in build provenance (Rust builds are not bit-reproducible).
 - v0.2.2 remains published but is immutable and superseded; new consumers should
@@ -62,10 +69,9 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
   `v0.2.1`'s: 19 lines added, none removed/changed).
 - Platforms: `darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm64`,
   `windows_amd64` (Windows is the **`-gnu`** / MinGW archive, for Go cgo).
-- Provenance note: these archives were **cross-built locally** (not via the
-  `peco-databricks-sql-kernel-go` CI release workflow, whose `peco-release`
-  reviewer gate requires a human). Re-cutting via CI for scanned provenance is
-  a recommended follow-up.
+- Provenance note: these archives were **cross-built locally** (not via
+  Databricks' internal CI release pipeline, whose reviewer gate requires a
+  human). Re-cutting via CI for scanned provenance is a recommended follow-up.
 
 ## [v0.2.1] - 2026-08-24
 
@@ -74,8 +80,8 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
   is that revision's header.
 - Platforms: `darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm64`,
   `windows_amd64` (Windows is the **`-gnu`** / MinGW archive, for Go cgo).
-- Built + security-scanned by the `peco-databricks-sql-kernel-go` release
-  workflow (GitHub-hosted macOS/Windows runners) and published here.
+- Built + security-scanned by Databricks' internal CI release pipeline and
+  published here.
 - Kernel C-ABI changes picked up in this release — identity federation /
   mandatory OIDC token exchange, JWT private-key M2M, Azure SP M2M, generic
   OAuth token-endpoint / scopes overrides, `kernel_session_test()`, retry-config
