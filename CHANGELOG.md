@@ -33,8 +33,17 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
 - v0.2.2 remains published but is immutable and superseded; new consumers should
   pin **v0.2.3**. (v0.2.1/v0.2.2 cannot be re-pointed — Go module versions are
   immutable once in the checksum DB.)
-- Platforms: `darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm64`,
-  `windows_amd64`.
+- **Two platforms added at `v0.2.3`** (later, from the same `dd810d6d` source):
+  `lib/linux_arm` (`armv7-unknown-linux-gnueabihf`) and `lib/windows_arm64`
+  (`aarch64-pc-windows-gnullvm`, built with llvm-mingw — Go cgo links a GNU `.a`,
+  not MSVC). These are **new module paths**, so they take their first tag at
+  `v0.2.3` without re-tagging the original five. Both are CI-built + trivy-scanned
+  (cross-compiled on the Linux runner) and their `#cgo LDFLAGS` are validated by
+  an in-CI on-demand link-check against every exported `kernel_*` symbol:
+  `linux_arm` → `-lm -ldl` (no `-lstdc++`; the archive has no C++), `windows_arm64`
+  → `-lbcrypt -lntdll` (its other Windows imports are embedded via raw-dylib).
+- Platforms (7): `darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm64`,
+  `linux_arm`, `windows_amd64`, `windows_arm64`.
 
 ## [v0.2.2] - 2026-08-27
 
