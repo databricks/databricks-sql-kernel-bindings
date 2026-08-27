@@ -10,6 +10,10 @@ can link the kernel via `go get` with **no Rust toolchain and no build step**.
 > requires the right platform module for you automatically when you build with
 > `-tags databricks_kernel`.
 
+> **Issues and feature requests:** GitHub issues are disabled here — this repo
+> only ships prebuilt artifacts. Please file them in the driver repo instead:
+> [databricks/databricks-sql-go/issues](https://github.com/databricks/databricks-sql-go/issues).
+
 ## Why this repo exists
 
 The kernel is a Rust library exposed over a C ABI. Go's module system can only
