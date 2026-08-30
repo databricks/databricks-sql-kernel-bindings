@@ -20,6 +20,14 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
 
 ## [Unreleased]
 
+## [v0.3.0] - 2026-08-28
+
+- Built from **`databricks-sql-kernel` commit `46fffe9e`**, tagged `v0.3.0`.
+  All archives were CI-built and trivy-scanned by
+  [`peco-databricks-sql-kernel-go` run 33220006730](https://github.com/databricks/secure-public-registry-releases-eng/actions/runs/33220006730).
+- Platforms (7): `darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm64`,
+  `linux_arm`, `windows_amd64`, `windows_arm64`. The workflow's cgo link checks
+  passed for `linux_arm` and `windows_arm64`.
 - Remove the committed `include/databricks_kernel.h`. Nothing in this repo
   compiles against it — the `lib/<platform>` modules carry only the archive +
   `#cgo LDFLAGS`. The C-ABI header is owned by the driver's cgo layer
