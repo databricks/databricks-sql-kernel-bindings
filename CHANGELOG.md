@@ -20,6 +20,16 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
 
 ## [Unreleased]
 
+## [v1.2.0] - 2026-10-19
+
+- Built from `databricks-sql-kernel` tag `v1.2.0`, commit `39ba84f5ab55c2b0bc874fd58a6f9215ee27cb23`.
+  CI build and scan: [run 39332574661](https://github.com/databricks/secure-public-registry-releases-eng/actions/runs/39332574661).
+- Platforms (7): `darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm`,
+  `linux_arm64`, `windows_amd64`, `windows_arm64`. The `linux_arm` and
+  `windows_arm64` cgo link checks passed.
+- Build archives with fat LTO and one codegen unit to keep every archive below
+  GitHub's 100 MiB file limit.
+
 ## [v1.1.0] - 2026-09-23
 
 - Built from **`databricks-sql-kernel` commit `41a1ee5d`**, tagged `v1.1.0`.
