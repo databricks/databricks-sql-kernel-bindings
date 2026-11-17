@@ -12,9 +12,12 @@
 // LDFLAGS below expect. The archive is at the revision recorded in the driver's
 // KERNEL_REV, produced by the kernel repo's build-c-abi-libs workflow (or an
 // equivalent cross-build). See the repo README and databricks-sql-kernel#244.
+//
+// The archive is a positional ${SRCDIR} input; Go 1.27.4+ rejects the GNU
+// `-l:<file>` form in cgo LDFLAGS.
 package kernellib_windows_amd64
 
 /*
-#cgo LDFLAGS: -L${SRCDIR} -l:libdatabricks_sql_kernel.a -lstdc++ -lm -lws2_32 -lbcrypt -lntdll -luserenv
+#cgo LDFLAGS: ${SRCDIR}/libdatabricks_sql_kernel.a -lstdc++ -lm -lws2_32 -lbcrypt -lntdll -luserenv
 */
 import "C"
