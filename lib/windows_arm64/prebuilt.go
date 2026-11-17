@@ -15,10 +15,12 @@
 // Windows imports via raw-dylib (ws2_32/userenv/secur32/kernel32/...). The two
 // load-time imports it does not embed — BCryptGenRandom (bcrypt) and
 // NtCreateNamedPipeFile (ntdll) — are supplied explicitly below. Unwinding and
-// compiler-rt builtins are auto-linked by the llvm-mingw clang driver.
+// compiler-rt builtins are auto-linked by the llvm-mingw clang driver. The
+// archive is a positional ${SRCDIR} input; Go 1.27.4+ rejects the GNU
+// `-l:<file>` form in cgo LDFLAGS.
 package kernellib_windows_arm64
 
 /*
-#cgo LDFLAGS: -L${SRCDIR} -l:libdatabricks_sql_kernel.a -lbcrypt -lntdll
+#cgo LDFLAGS: ${SRCDIR}/libdatabricks_sql_kernel.a -lbcrypt -lntdll
 */
 import "C"

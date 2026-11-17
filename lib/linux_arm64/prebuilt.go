@@ -10,11 +10,11 @@
 // cross-build) and committed beside this file. See the repo README and
 // databricks-sql-kernel#244.
 //
-// The -l:libdatabricks_sql_kernel.a form (GNU-ld extension) forces the static
-// archive so the linker never prefers a same-named .so.
+// The archive is a positional ${SRCDIR} input so the linker never prefers a
+// same-named .so; Go 1.27.4+ rejects the GNU `-l:<file>` form in cgo LDFLAGS.
 package kernellib_linux_arm64
 
 /*
-#cgo LDFLAGS: -L${SRCDIR} -l:libdatabricks_sql_kernel.a -lstdc++ -lm -ldl
+#cgo LDFLAGS: ${SRCDIR}/libdatabricks_sql_kernel.a -lstdc++ -lm -ldl
 */
 import "C"

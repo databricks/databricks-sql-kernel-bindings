@@ -20,6 +20,12 @@ Tags are path-prefixed per module (`lib/<platform>/vX.Y.Z`) plus a root
 
 ## [Unreleased]
 
+- Link the archive as a positional `${SRCDIR}` input on Linux and Windows, as
+  Darwin already does. Go 1.27.4 rejects `-l:libdatabricks_sql_kernel.a` in cgo
+  LDFLAGS. Go 1.27.4 also rejects archives that embed LLVM bitcode, which every
+  `v1.4.0` archive does, so `-tags databricks_kernel` builds on Go 1.27.4+ need
+  the next release's re-built archives as well.
+
 ## [v1.4.0] - 2026-11-04
 
 - Built from `databricks-sql-kernel` tag `v1.4.0`, commit `c58f62c95f3651488f6270c0b45686614486d351`.

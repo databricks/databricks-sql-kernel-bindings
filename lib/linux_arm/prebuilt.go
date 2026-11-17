@@ -10,13 +10,14 @@
 // runner via gcc-arm-linux-gnueabihf) and committed beside this file. See the
 // repo README and RELEASING.md.
 //
-// The -l:libdatabricks_sql_kernel.a form (GNU-ld extension) forces the static
-// archive so the linker never prefers a same-named .so. The archive has no C++
-// symbols, so unlike some platforms it needs no -lstdc++ (unwinding is provided
-// by libgcc, auto-linked by the C driver); it needs only libm and libdl.
+// The archive is a positional ${SRCDIR} input so the linker never prefers a
+// same-named .so; Go 1.27.4+ rejects the GNU `-l:<file>` form in cgo LDFLAGS.
+// The archive has no C++ symbols, so unlike some platforms it needs no -lstdc++
+// (unwinding is provided by libgcc, auto-linked by the C driver); it needs only
+// libm and libdl.
 package kernellib_linux_arm
 
 /*
-#cgo LDFLAGS: -L${SRCDIR} -l:libdatabricks_sql_kernel.a -lm -ldl
+#cgo LDFLAGS: ${SRCDIR}/libdatabricks_sql_kernel.a -lm -ldl
 */
 import "C"
